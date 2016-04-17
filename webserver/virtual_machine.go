@@ -1,5 +1,9 @@
 package webserver
 
+import (
+    "fmt"
+)
+
 type InstancesInfo struct {
     Data Instances `json:"data"`  
     Version float64 `json:"version"`
@@ -18,4 +22,21 @@ type VirtualMachine struct {
     Port int `json:"port"`
     Server int `json:"server"`
     Uuid string `json:"uuid"`
+}
+
+func PrintVirtualMachinesList(virtualMachines []VirtualMachine) {
+    if virtualMachines != nil && len(virtualMachines) > 0 {
+        fmt.Println("|---------------ID-------------------||------STATE------|")
+        for index := 0; index < len(virtualMachines); index++ {
+            printVirtualMachine(virtualMachines[index])
+        }
+    } else {
+        fmt.Println("No running Virtual Machines were found....")
+    }
+}
+
+func printVirtualMachine(virtualMachine VirtualMachine) {
+    fmt.Printf("|%v|", virtualMachine.Id)
+    fmt.Printf("|    %v      |", virtualMachine.InstanceState)
+    fmt.Printf("\n")
 }
