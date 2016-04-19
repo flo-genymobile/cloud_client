@@ -45,6 +45,8 @@ func main() {
     token := login()
     vms := getVirtualMachineList(token)
     webserver.PrintVirtualMachinesList(vms)
-    pushFileToVirtualMachine(vms[0].Id, token, "/home/flo/file.txt")
-    installApplicationOnVirtualMachine(vms[0].Id, token, "/home/flo/Downloads/FDroid.apk")
+    if len(vms) > 0 {
+        pushFileToVirtualMachine(vms[0].Id, token, "/home/flo/file.txt")
+        installApplicationOnVirtualMachine(vms[0].Id, token, "/home/flo/Downloads/FDroid.apk")    
+    }
 }
