@@ -3,11 +3,12 @@ package main
 import (
     "fmt"
     "cloud_adb_client/webserver"
+    "flag"
 )
 
-func login() string {
+func login(username string, password string) string {
     url := webserver.GetLoginURL()
-    user := webserver.User{"", ""}
+    user := webserver.User{username, password}
     request := webserver.PrepareLogin(url, user)
     streamResponse := webserver.DoRequest(request)
     jsonResponse := webserver.ParseSigninResponse(streamResponse)
@@ -42,7 +43,11 @@ func installApplicationOnVirtualMachine(id string, token string, apkPath string)
 }
 
 func main() {
-    token := login()
+    userPointer := flag.String("user", "foo", "valid genymotion cloud username")
+    passwordPointer := flag.String("password", "foo", "valid genymotion cloud password")
+    flag.Parse()
+    
+    token := login(*userPointer, *passwordPointer)
     vms := getVirtualMachineList(token)
     webserver.PrintVirtualMachinesList(vms)
     if len(vms) > 0 {
