@@ -3,8 +3,26 @@ package main
 import (
     "fmt"
     "cloud_adb_client/webserver"
-    "flag"
+    "gopkg.in/gcfg.v1"
 )
+
+type Config struct {
+    UserInfo struct {
+        Username string
+        Password string    
+    }
+}
+
+func loadConfiguration(configFilePath string) Config {
+    var config Config
+    error := gcfg.ReadFileInto(&config, configFilePath)
+    
+    if error != nil {
+        fmt.Println("Error while reading config file", error)
+    }
+    
+    return config
+}
 
 func login(username string, password string) string {
     url := webserver.GetLoginURL()
@@ -43,15 +61,18 @@ func installApplicationOnVirtualMachine(id string, token string, apkPath string)
 }
 
 func main() {
-    userPointer := flag.String("user", "foo", "valid genymotion cloud username")
-    passwordPointer := flag.String("password", "foo", "valid genymotion cloud password")
-    flag.Parse()
+    config := loadConfiguration("/home/flo/.config/CloudClient/settings.ini")
     
-    token := login(*userPointer, *passwordPointer)
-    vms := getVirtualMachineList(token)
+    if config.UserInfo.Username == "" {
+        fmt.Println("No user config found, place a valid settings.ini under ~/.config/CloudClient/")
+    } else {
+        login(config.UserInfo.Username, config.UserInfo.Password)    
+    }
+    
+    /*vms := getVirtualMachineList(token)
     webserver.PrintVirtualMachinesList(vms)
     if len(vms) > 0 {
         pushFileToVirtualMachine(vms[0].Id, token, "/home/flo/file.txt")
         installApplicationOnVirtualMachine(vms[0].Id, token, "/home/flo/Downloads/FDroid.apk")    
-    }
+    }*/
 }
