@@ -4,6 +4,7 @@ import (
     "fmt"
     "cloud_adb_client/webserver"
     "gopkg.in/gcfg.v1"
+    "flag"
 )
 
 type Config struct {
@@ -41,7 +42,6 @@ func getVirtualMachineList(token string) []webserver.VirtualMachine {
     streamResponse := webserver.DoRequest(request)
    
     virtualMachineList := webserver.ParseGetInstancesResponse(streamResponse)  
-    fmt.Println("Found instance 0: ", virtualMachineList.Data)
     
     return virtualMachineList.Data.VirtualMachines
 }
@@ -60,19 +60,67 @@ func installApplicationOnVirtualMachine(id string, token string, apkPath string)
     webserver.DoRequest(request)
 }
 
+func stopVirtualMachine(id string, token string) {
+    url := webserver.GetVirtualMachineActionURL(id, "stop")
+    request := webserver.PreparePost(url, token)
+    webserver.DoRequest(request)
+}
+
+func startVirtualMachine(id string, token string) {
+    url := webserver.GetVirtualMachineActionURL(id, "start")
+    request := webserver.PreparePost(url, token)
+    webserver.DoRequest(request)
+}
+
 func main() {
+    var token string
     config := loadConfiguration("/home/flo/.config/CloudClient/settings.ini")
     
     if config.UserInfo.Username == "" {
         fmt.Println("No user config found, place a valid settings.ini under ~/.config/CloudClient/")
     } else {
-        login(config.UserInfo.Username, config.UserInfo.Password)    
+        token = login(config.UserInfo.Username, config.UserInfo.Password)    
     }
     
-    /*vms := getVirtualMachineList(token)
-    webserver.PrintVirtualMachinesList(vms)
-    if len(vms) > 0 {
-        pushFileToVirtualMachine(vms[0].Id, token, "/home/flo/file.txt")
-        installApplicationOnVirtualMachine(vms[0].Id, token, "/home/flo/Downloads/FDroid.apk")    
-    }*/
+    var action string
+    flag.StringVar(&action, "action", "none", "Provide an action to perform")
+    
+    flag.Parse()
+    
+    if action == "none" {
+        fmt.Println("No action provided...")
+    } else {
+        if action == "list" {
+            vms := getVirtualMachineList(token)
+            webserver.PrintVirtualMachinesList(vms)
+        } else if action == "install" {
+            var apkPath string
+            apkPath = flag.Args()[0]
+            var vmId string
+            vmId = flag.Args()[1]
+            
+            fmt.Println("Installing " + apkPath + " onto " + vmId)
+            installApplicationOnVirtualMachine(vmId, token, apkPath)    
+        } else if action == "push" {
+            var filePath string
+            filePath = flag.Args()[0]
+            var vmId string
+            vmId = flag.Args()[1]
+            
+            fmt.Println("Pushing " + filePath + " onto " + vmId)
+            pushFileToVirtualMachine(vmId, token, filePath)    
+        } else if action == "stop" {
+            var vmId string
+            vmId = flag.Args()[0]
+            
+            fmt.Println("Stopping " + vmId)
+            stopVirtualMachine(vmId, token)
+        } else if action == "start" {
+            var vmId string
+            vmId = flag.Args()[0]
+            
+            fmt.Println("Starting " + vmId)
+            startVirtualMachine(vmId, token)
+        }
+    }
 }

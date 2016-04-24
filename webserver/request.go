@@ -36,6 +36,16 @@ func PrepareGet(url string, token string) *http.Request {
     return request
 }
 
+func PreparePost(url string, token string) *http.Request {
+    request, error := http.NewRequest("POST", url, nil)
+    if error != nil {
+        fmt.Println("can't create request: ", error)
+    }
+    
+    request.Header.Set("Authorization", "Bearer " + token)
+    return request
+}
+
 func PrepareAdbPost(url string, token string, commandInfo AdbCommandInfo) *http.Request {
     //Open file
     file, error := os.Open(commandInfo.FilePath)
