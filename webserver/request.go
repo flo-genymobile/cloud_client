@@ -87,6 +87,7 @@ func PrepareAdbPost(url string, token string, commandInfo AdbCommandInfo) *http.
 
 func DoRequest(request *http.Request) io.ReadCloser {
     httpClient := &http.Client{}
+    fmt.Println("Do request: " + request.Method + ", " + request.Host + ", " + request.URL.Path)
     httpresponse, error := httpClient.Do(request)
     if error != nil {
         fmt.Println("Request failed: ", error)
@@ -97,6 +98,7 @@ func DoRequest(request *http.Request) io.ReadCloser {
     
     //TODO: handle errors
     fmt.Println("Request Status Code: ", httpresponse.StatusCode)
+    fmt.Println()
     
     return httpresponse.Body    
 }

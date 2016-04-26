@@ -112,14 +112,12 @@ func main() {
         } else if action == "stop" {
             var vmId string
             vmId = flag.Args()[0]
-            
-            fmt.Println("Stopping " + vmId)
+         
             stopVirtualMachine(vmId, token)
         } else if action == "start" {
             var vmId string
             vmId = flag.Args()[0]
             
-            fmt.Println("Starting " + vmId)
             startVirtualMachine(vmId, token)
         }
     }

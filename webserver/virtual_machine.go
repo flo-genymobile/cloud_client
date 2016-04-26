@@ -26,7 +26,7 @@ type VirtualMachine struct {
 
 func PrintVirtualMachinesList(virtualMachines []VirtualMachine) {
     if virtualMachines != nil && len(virtualMachines) > 0 {
-        fmt.Println("|---------------ID-------------------||------STATE------|")
+        fmt.Println("|---------------ID-------------------||------STATE------||----------------NAME-----------------------------------|")
         for index := 0; index < len(virtualMachines); index++ {
             printVirtualMachine(virtualMachines[index])
         }
@@ -38,5 +38,6 @@ func PrintVirtualMachinesList(virtualMachines []VirtualMachine) {
 func printVirtualMachine(virtualMachine VirtualMachine) {
     fmt.Printf("|%v|", virtualMachine.Id)
     fmt.Printf("|    %v      |", virtualMachine.InstanceState)
+    fmt.Printf("|    %v", virtualMachine.Name)
     fmt.Printf("\n")
 }
