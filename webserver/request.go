@@ -101,7 +101,7 @@ func DoRequest(request *http.Request) io.ReadCloser {
     
     //TODO: handle errors
     fmt.Println("Request Status Code: ", httpresponse.StatusCode)
-    fmt.Println()
+    fmt.Println()   
     
     return httpresponse.Body    
 }

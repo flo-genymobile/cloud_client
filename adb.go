@@ -67,6 +67,17 @@ func uninstallApplicationOnVirtualMachine(id string, token string, packageName s
     webserver.DoRequest(request)
 }
 
+func executeAdbCommandOnVirtualMachine(id string, token string, adbCommand string) string {
+    url := webserver.GetAdbURL(id)
+    adbCommandInfo := webserver.BuildAdbShellCommand(adbCommand)
+    request := webserver.PrepareAdbPost(url, token, adbCommandInfo)
+    streamResponse := webserver.DoRequest(request)
+    jsonResponse := webserver.ParseAdbResponse(streamResponse)
+    fmt.Println(jsonResponse.Data.Output)
+    
+    return jsonResponse.Data.Output
+}
+
 func stopVirtualMachine(id string, token string) {
     url := webserver.GetVirtualMachineActionURL(id, "stop")
     request := webserver.PreparePost(url, token)
@@ -124,6 +135,14 @@ func main() {
             
             fmt.Println("Pushing " + filePath + " onto " + vmId)
             pushFileToVirtualMachine(vmId, token, filePath)    
+        } else if action == "shell" {
+            var adbCommand string
+            adbCommand = flag.Args()[0]
+            var vmId string
+            vmId = flag.Args()[1]
+            
+            fmt.Println("Executing " + adbCommand + " onto " + vmId)
+            executeAdbCommandOnVirtualMachine(vmId, token, adbCommand)
         } else if action == "stop" {
             var vmId string
             vmId = flag.Args()[0]

@@ -29,3 +29,15 @@ func ParseGetInstancesResponse(inputStream io.ReadCloser) InstancesInfo {
     
     return response
 }
+
+func ParseAdbResponse(inputStream io.ReadCloser) AdbResponse {
+    decoder := json.NewDecoder(inputStream)
+    var response AdbResponse
+    
+    error := decoder.Decode(&response)
+    if error != nil {
+        fmt.Println("%T\n%s\n%#v\n", error, error, error)
+    }
+    
+    return response
+}
