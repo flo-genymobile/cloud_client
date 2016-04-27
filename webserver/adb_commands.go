@@ -2,6 +2,7 @@ package webserver
 
 const PUSH string = "push"
 const INSTALL string = "install"
+const UNINSTALL string = "uninstall"
 const PUSH_FILE_ARG string = "FILE /data/app/"
 const INSTALL_FILE_ARG string = "FILE"
 
@@ -17,4 +18,8 @@ func BuildAdbPushCommand(filePath string) AdbCommandInfo {
 
 func BuildAdbInstallCommand(apkPath string) AdbCommandInfo {
     return AdbCommandInfo{INSTALL, INSTALL_FILE_ARG, apkPath}
+}
+
+func BuildAdbUninstallCommand(packageName string) AdbCommandInfo {
+    return AdbCommandInfo{UNINSTALL, packageName, ""}
 }

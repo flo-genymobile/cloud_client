@@ -47,32 +47,35 @@ func PreparePost(url string, token string) *http.Request {
 }
 
 func PrepareAdbPost(url string, token string, commandInfo AdbCommandInfo) *http.Request {
-    //Open file
-    file, error := os.Open(commandInfo.FilePath)
-    if error != nil {
-        fmt.Println("can't create request: ", error)
-        return nil
-    }
-    defer file.Close()
-
     //Prepare multi part writer
     body := &bytes.Buffer{}
     writer := multipart.NewWriter(body)
     writer.WriteField("cmd", commandInfo.Command)
     writer.WriteField("args", commandInfo.Arguments)
-    //add raw file data
-    part, error := writer.CreateFormFile("file", filepath.Base(commandInfo.FilePath))
-    if error != nil {
-        fmt.Println("can't create request: ", error)
-        return nil
+    
+    if commandInfo.FilePath != "" {
+        //Open file
+        file, error := os.Open(commandInfo.FilePath)
+        if error != nil {
+            fmt.Println("can't create request: ", error)
+            return nil
+        }
+        defer file.Close()
+        
+        //add raw file data
+        part, error := writer.CreateFormFile("file", filepath.Base(commandInfo.FilePath))
+        if error != nil {
+            fmt.Println("can't create request: ", error)
+            return nil
+        }
+        io.Copy(part, file)
     }
-    io.Copy(part, file)
-
-    error = writer.Close()
-    if error != nil {
-        fmt.Println("can't create request: ", error)
-        return nil
-    }
+    
+    error := writer.Close()
+        if error != nil {
+            fmt.Println("can't create request: ", error)
+            return nil
+        }
   
     request, error := http.NewRequest("POST", url, body)
     if error != nil {

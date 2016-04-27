@@ -60,6 +60,13 @@ func installApplicationOnVirtualMachine(id string, token string, apkPath string)
     webserver.DoRequest(request)
 }
 
+func uninstallApplicationOnVirtualMachine(id string, token string, packageName string) {
+    url := webserver.GetAdbURL(id)
+    adbCommandInfo := webserver.BuildAdbUninstallCommand(packageName)
+    request := webserver.PrepareAdbPost(url, token, adbCommandInfo)
+    webserver.DoRequest(request)
+}
+
 func stopVirtualMachine(id string, token string) {
     url := webserver.GetVirtualMachineActionURL(id, "stop")
     request := webserver.PreparePost(url, token)
@@ -101,6 +108,14 @@ func main() {
             
             fmt.Println("Installing " + apkPath + " onto " + vmId)
             installApplicationOnVirtualMachine(vmId, token, apkPath)    
+        } else if action == "uninstall" {
+            var packageName string
+            packageName = flag.Args()[0]
+            var vmId string
+            vmId = flag.Args()[1]
+            
+            fmt.Println("Uninstalling " + packageName + " from " + vmId)
+            uninstallApplicationOnVirtualMachine(vmId, token, packageName)    
         } else if action == "push" {
             var filePath string
             filePath = flag.Args()[0]
